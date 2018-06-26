@@ -16,10 +16,12 @@
 
 package com.medyas.journalapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -28,12 +30,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class JournalEntries extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    private List<EntryListClass> dataList = new ArrayList<EntryListClass>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +48,12 @@ public class JournalEntries extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_entry_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(getApplicationContext(), AddEditEntry.class);
+                startActivity(intent);
             }
         });
 
@@ -60,9 +66,10 @@ public class JournalEntries extends AppCompatActivity {
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         // specify an adapter (see also next example)
-        mAdapter = new AdapterJournalEntries();
+        mAdapter = new AdapterJournalEntries(dataList, getResources());
         mRecyclerView.setAdapter(mAdapter);
 
 

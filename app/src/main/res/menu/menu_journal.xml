@@ -5,7 +5,8 @@
         android:id="@+id/app_bar_search"
         app:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/baseline_search_white_48"
-        android:title="@string/search" />
+        android:title="@string/search"
+        app:showAsAction="always"/>
 
     <item android:id="@+id/menu_share_entry"
         android:icon="@drawable/baseline_share_white_48"

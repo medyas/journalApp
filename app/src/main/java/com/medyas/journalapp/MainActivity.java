@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnF
                             Log.w("", "createUserWithEmail:failure", task.getException());
                             Toast.makeText(MainActivity.this, "Failed to create the accoutn, please try again.",
                                     Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
                             updateUI(null);
                         }
 

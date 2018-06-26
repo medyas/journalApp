@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_linearlayout"
     android:layout_width="match_parent"
     android:layout_height="80dp"
@@ -28,7 +29,7 @@
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/textView_text"
+                android:id="@+id/textView_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="serif"
@@ -43,7 +44,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/textView_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
@@ -52,10 +53,10 @@
                 android:textSize="13sp" />
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/imageView_fav"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/btn_star" />
+                app:srcCompat="@android:drawable/btn_star_big_off" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
