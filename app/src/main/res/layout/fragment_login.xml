@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prompt_email"
+            android:textColor="@color/iron"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"/>
+
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/editTextEmailLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:ems="10"
+            android:textColorLink="@color/white"
+            app:backgroundTint="@color/white"
+            android:hint="Email Address"
+            android:inputType="textEmailAddress" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prompt_password"
+            android:textColor="@color/iron"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="5dp" />
+
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/editTextPassLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:textColorLink="@color/white"
+            app:backgroundTint="@color/white"
+            android:hint="Password"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp" />
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/action_sign_in_short"
+            android:background="@drawable/btn_round_edge"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="5dp" />
+
+        <TextView
+            android:id="@+id/createNew"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_account_msg"
+            android:layout_marginTop="35dp"
+            android:layout_marginBottom="5dp"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:textAlignment="center"/>
+
+
+    </LinearLayout>
+</FrameLayout>
