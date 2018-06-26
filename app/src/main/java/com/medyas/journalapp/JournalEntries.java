@@ -20,10 +20,20 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 public class JournalEntries extends AppCompatActivity {
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +50,43 @@ public class JournalEntries extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_items);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        // specify an adapter (see also next example)
+        mAdapter = new AdapterJournalEntries();
+        mRecyclerView.setAdapter(mAdapter);
+
+
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_journal, menu);
+        return true;
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_share_entry:
+                return true;
+            case R.id.menu_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

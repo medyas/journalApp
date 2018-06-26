@@ -38,6 +38,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import org.w3c.dom.Text;
 
@@ -97,14 +98,46 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnF
     }
 
     @Override
-    public void createAccount(String username, String email, String password) {
+    public void createAccount(final String username, String email, String password) {
         final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this,
                 R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating...");
-        //progressDialog.setCancelable(false);
+        progressDialog.setCancelable(false);
         progressDialog.show();
-        //progressDialog.dismiss();
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(username)
+                                    .build();
+
+                            user.updateProfile(profileUpdates)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+
+                                            }
+                                        }
+                                    });
+                            progressDialog.dismiss();
+                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("", "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(MainActivity.this, "Failed to create the accoutn, please try again.",
+                                    Toast.LENGTH_SHORT).show();
+                            updateUI(null);
+                        }
+
+                    }
+                });
+
     }
 
     @Override

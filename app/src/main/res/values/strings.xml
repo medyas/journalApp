@@ -21,5 +21,8 @@
     <string name="create_account_msg">No account yet? Create one</string>
     <string name="login_msg">Already a member? Login</string>
 
+    <string name="search">Search</string>
+    <string name="share_entry">Share</string>
+    <string name="settings">Settings</string>
 
 </resources>
