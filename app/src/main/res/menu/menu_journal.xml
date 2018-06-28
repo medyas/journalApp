@@ -8,11 +8,6 @@
         android:title="@string/search"
         app:showAsAction="always"/>
 
-    <item android:id="@+id/menu_share_entry"
-        android:icon="@drawable/baseline_share_white_48"
-        android:title="@string/share_entry"
-        app:showAsAction="ifRoom"/>
-
     <item android:id="@+id/menu_settings"
         android:icon="@drawable/baseline_settings_white_48"
         android:title="@string/settings"

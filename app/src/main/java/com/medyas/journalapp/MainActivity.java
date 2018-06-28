@@ -18,7 +18,9 @@ package com.medyas.journalapp;
 
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -86,7 +88,13 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnF
     private void updateUI(FirebaseUser currentUser) {
         if(currentUser != null) {
             Intent intent = new Intent(MainActivity.this, JournalEntries.class);
-            intent.putExtra("client_uid", currentUser.getUid());
+            intent.putExtra(getString(R.string.clientUID), currentUser.getUid());
+
+            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString(getString(R.string.clientUID), currentUser.getUid());
+            editor.commit();
+
             startActivity(intent);
         }
     }

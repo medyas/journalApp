@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_share_entry"
+        android:icon="@drawable/baseline_share_white_48"
+        android:title="@string/share_entry"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/menu_delete_entry"
+        android:icon="@drawable/baseline_delete_white_48"
+        android:title="@string/share_entry"
+        app:showAsAction="always"/>
+</menu>

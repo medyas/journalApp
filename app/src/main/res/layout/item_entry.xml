@@ -1,21 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_linearlayout"
     android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:layout_margin="10dp"
-    android:orientation="vertical">
+    android:layout_margin="10dp">
 
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:background="?android:attr/colorPressedHighlight">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="115dp"
+            android:gravity="center"
+            android:text="DELETE"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="15dp"
+            android:src="@drawable/baseline_delete_white_48" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="303dp"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
@@ -25,6 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:fontFamily="serif"
+                android:maxLength="30"
                 android:text="TextView"
                 android:textSize="20sp" />
 
@@ -33,6 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="serif"
+                android:maxLength="50"
                 android:text="TextView"
                 android:textSize="13sp" />
 
@@ -41,6 +69,8 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
             android:orientation="vertical">
 
             <TextView
@@ -50,6 +80,7 @@
                 android:layout_marginBottom="10dp"
                 android:fontFamily="serif"
                 android:text="TextView"
+                android:textAlignment="center"
                 android:textSize="13sp" />
 
             <ImageView
@@ -58,5 +89,6 @@
                 android:layout_height="wrap_content"
                 app:srcCompat="@android:drawable/btn_star_big_off" />
         </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+    </RelativeLayout>
+
+</FrameLayout>

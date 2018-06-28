@@ -5,21 +5,34 @@ import android.graphics.drawable.Drawable;
 
 public class EntryListClass {
 
-    private String title, content, date, priority;
+    private String title, content, date, priority, docId;
 
     public EntryListClass() {
         title = "";
         content = "";
         date = "";
         priority = "";
+        docId = "";
     }
 
-    public EntryListClass(String title, String content, String date, String priority) {
+
+    public EntryListClass(String title, String content, String date, String priority, String docId) {
         this.title = title;
         this.content = content;
         this.date = date;
         this.priority = priority;
+        this.docId = docId;
     }
+
+
+    public String getDocId() {
+        return docId;
+    }
+
+    public void setDocId(String docId) {
+        this.docId = docId;
+    }
+
 
     public String getTitle() {
         return title;
@@ -54,7 +67,7 @@ public class EntryListClass {
     }
 
     public Drawable getPriorityImage(Resources res) {
-        if(this.priority.equals("")) return res.getDrawable(android.R.drawable.btn_star_big_off);
+        if(this.priority.equals("false")) return res.getDrawable(android.R.drawable.btn_star_big_off);
         else return res.getDrawable(android.R.drawable.btn_star_big_on);
     }
 }
