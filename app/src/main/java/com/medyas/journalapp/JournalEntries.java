@@ -83,14 +83,16 @@ public class JournalEntries extends AppCompatActivity {
         setContentView(R.layout.activity_journal_entries);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        setTitle("My Journal");
+
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+
+        setTitle(user.getDisplayName().substring(0, 1).toUpperCase()+user.getDisplayName().substring(1)+" Journals");
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
         currentUserId = sharedPref.getString(getString(R.string.clientUID), null);
         if(currentUserId == null) {
-            FirebaseAuth mAuth = FirebaseAuth.getInstance();
-            user = mAuth.getCurrentUser();
             currentUserId = user.getUid();
         }
 

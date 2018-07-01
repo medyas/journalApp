@@ -13,10 +13,11 @@
     <color name="secondaryDarkColor">#006978</color>
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#000000</color>
+    <color name="itemBackgroundColor">#fafafa</color>
 
     <color name="primary">#E43F3F</color>
     <color name="primary_dark">#E12929</color>
-    <color name="primary_darker">#CC1D1D</color>
+    <color name="primary_darker">#cc1d1d</color>
     <color name="accent">#FFFFFF</color>
 
     <color name="black">#000000</color>

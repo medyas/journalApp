@@ -134,7 +134,8 @@ public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEn
             holder.title.setText("");
             holder.content.setText("");
         }
-        holder.date.setText(items.get(position).getDate());
+        String date = items.get(position).getDate().split("-")[0] +"-"+ items.get(position).getDate().split("-")[1];
+        holder.date.setText(date);
         holder.priority.setImageDrawable(items.get(position).getPriorityImage(res));
     }
 

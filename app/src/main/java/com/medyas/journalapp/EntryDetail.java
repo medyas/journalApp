@@ -102,7 +102,7 @@ public class EntryDetail extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         setTitle(document.getData().get(getString(R.string.entry_title)).toString());
-                        entryTitle.setText(document.getData().get(getString(R.string.entry_title)).toString());
+                        entryTitle.setText(document.getData().get(getString(R.string.entry_title)).toString().substring(0, 1).toUpperCase()+document.getData().get(getString(R.string.entry_title)).toString().substring(1));
                         entryContent.setText(document.getData().get(getString(R.string.entry_content)).toString());
                         if(document.getData().get(getString(R.string.entry_priority)).toString().equals("true")) {
                             entryPri.setChecked(true);
