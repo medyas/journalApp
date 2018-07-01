@@ -1,5 +1,5 @@
 # Journal App - Google Africa Scholarship Program - ALC with Google
-![Grow With Google](scholoarshipLogo.jpg)
+![Grow With Google](static/scholoarshipLogo.jpg)
 ## This app is part of the Android Dev Track - Andela Learning Community (ALC) #7DaysofCodeChallenge
 ### Journal app allows users to pen down their thoughts and feelings. 
 ### Main Featuers:
@@ -13,4 +13,4 @@
 - Allow the app to work offline, using SQLite DB.
 - Use background services to Sync between the DB and Firestore.
 
-*** [Download APK](JournalApp.apk)
+*** [Download APK](static/JournalApp.apk)
