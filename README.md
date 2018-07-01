@@ -13,4 +13,4 @@
 - Allow the app to work offline, using SQLite DB.
 - Use background services to Sync between the DB and Firestore.
 
-*** [Download APK](static/JournalApp.apk)
+ [*** Download APK](static/JournalApp.apk)
