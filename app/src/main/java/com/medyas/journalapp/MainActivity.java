@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -46,7 +47,7 @@ import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements LoginFragment.OnFragmentInteractionListener, RegisterFragment.OnFragmentInteractionListener {
 
-    DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
+    ViewPagerAdapter mviewPagerAdapter;
     ViewPager mViewPager;
     public TextView appLogo;
     private FirebaseAuth mAuth;
@@ -59,11 +60,11 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnF
 
         mAuth = FirebaseAuth.getInstance();
 
-        mDemoCollectionPagerAdapter =
-                new DemoCollectionPagerAdapter(
+        mviewPagerAdapter =
+                new ViewPagerAdapter(
                         getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mDemoCollectionPagerAdapter);
+        mViewPager.setAdapter(mviewPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -90,9 +91,11 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnF
             Intent intent = new Intent(MainActivity.this, JournalEntries.class);
             intent.putExtra(getString(R.string.clientUID), currentUser.getUid());
 
-            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences sharedPref =  PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString(getString(R.string.clientUID), currentUser.getUid());
+            editor.putString(getString(R.string.clientDisplayName), currentUser.getDisplayName());
+            editor.putString(getString(R.string.clientEmail), currentUser.getEmail());
             editor.commit();
 
             startActivity(intent);
@@ -203,8 +206,8 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnF
 
 // Since this is an object collection, use a FragmentStatePagerAdapter,
 // and NOT a FragmentPagerAdapter.
-class DemoCollectionPagerAdapter extends FragmentStatePagerAdapter {
-    public DemoCollectionPagerAdapter(FragmentManager fm) {
+class ViewPagerAdapter extends FragmentStatePagerAdapter {
+    public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 

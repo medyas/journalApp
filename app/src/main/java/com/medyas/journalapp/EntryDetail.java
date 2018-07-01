@@ -122,11 +122,16 @@ public class EntryDetail extends AppCompatActivity {
     }
 
     public void deleteEntry(String docId) {
-        db.collection("journalentries").document(docId).delete()
+        progress.setVisibility(View.VISIBLE);
+        container.setVisibility(View.GONE);
+        db.collection("journal_entries").document(docId).delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        onBackPressed();
+                        progress.setVisibility(View.GONE);
+                        container.setVisibility(View.VISIBLE);
+                        Intent intent = new Intent(getApplicationContext(), JournalEntries.class);
+                        startActivity(intent);
                         Toast.makeText(getApplicationContext(), "Entry deleted.",
                                 Toast.LENGTH_SHORT).show();
                     }

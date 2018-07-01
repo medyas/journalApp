@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -20,7 +19,6 @@
             android:name=".JournalEntries"
             android:label="@string/title_activity_journal_entries"
             android:theme="@style/AppThemeNoToolBar" />
-
         <activity
             android:name=".EntryDetail"
             android:label="@string/title_activity_entry_detail"
@@ -29,22 +27,29 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.medyas.journalapp.JournalEntries" />
         </activity>
-
-        <activity android:name=".AddEditEntry"
+        <activity
+            android:name=".AddEditEntry"
             android:theme="@style/AppThemeNoToolBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.medyas.journalapp.JournalEntries" />
         </activity>
-
-
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:theme="@style/AppThemeNoToolBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/AppThemeToolBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.medyas.journalapp.JournalEntries" />
         </activity>
     </application>
 

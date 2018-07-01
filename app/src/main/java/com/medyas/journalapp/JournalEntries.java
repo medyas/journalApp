@@ -20,7 +20,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -49,6 +51,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -67,6 +70,7 @@ public class JournalEntries extends AppCompatActivity {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String currentUserId;
+    private FirebaseUser user;
 
     private SearchView searchEntry;
     private ProgressBar progress;
@@ -81,12 +85,12 @@ public class JournalEntries extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setTitle("My Journal");
 
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
         currentUserId = sharedPref.getString(getString(R.string.clientUID), null);
         if(currentUserId == null) {
             FirebaseAuth mAuth = FirebaseAuth.getInstance();
-            FirebaseUser user = mAuth.getCurrentUser();
+            user = mAuth.getCurrentUser();
             currentUserId = user.getUid();
         }
 
@@ -105,7 +109,6 @@ public class JournalEntries extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 refreshData();
-                swipeRefreshLayout.setRefreshing(false);
             }
         });
         swipeRefreshLayout.setColorSchemeResources(R.color.secondaryDarkColor, R.color.secondaryColor, R.color.secondaryLightColor);
@@ -150,19 +153,48 @@ public class JournalEntries extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             mAdapter.notifyItemRemoved(position);    //item removed from recylcerview
-                            deleteEntry(dataList.get(position).getDocId());
+                            mAdapter.removeItem(position);
                             dataList.remove(position);  //then remove item
-                            return;
+                            mAdapter.notifyDataSetChanged();
+                            deleteEntry(dataList.get(position).getDocId());
                         }
                     }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {  //not removing items if cancel is done
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             mAdapter.notifyItemRemoved(position + 1);    //notifies the RecyclerView Adapter that data in adapter has been removed at a particular position.
                             mAdapter.notifyItemRangeChanged(position, mAdapter.getItemCount());   //notifies the RecyclerView Adapter that positions of element in adapter has been changed from position(removed element index to end of list), please update it.
-                            return;
                         }
                     }).show();  //show alert dialog
                 }
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                final View foregroundView = ((AdapterJournalEntries.ViewHolder) viewHolder).viewFor;
+
+                getDefaultUIUtil().onDraw(c, recyclerView, foregroundView, dX, dY,
+                        actionState, isCurrentlyActive);
+            }
+
+            @Override
+            public void onChildDrawOver(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                final View foregroundView = ((AdapterJournalEntries.ViewHolder) viewHolder).viewFor;
+                getDefaultUIUtil().onDrawOver(c, recyclerView, foregroundView, dX, dY,
+                        actionState, isCurrentlyActive);
+            }
+
+            @Override
+            public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                final View foregroundView = ((AdapterJournalEntries.ViewHolder) viewHolder).viewFor;
+                getDefaultUIUtil().clearView(foregroundView);
+            }
+
+            @Override
+            public int convertToAbsoluteDirection(int flags, int layoutDirection) {
+                return super.convertToAbsoluteDirection(flags, layoutDirection);
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
@@ -201,6 +233,7 @@ public class JournalEntries extends AppCompatActivity {
                                     .show();
                         }
                         progress.setVisibility(View.GONE);
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 });
     }
@@ -208,7 +241,7 @@ public class JournalEntries extends AppCompatActivity {
     public void deleteEntry(String docId) {
         progress.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
-        db.collection("journalentries").document(docId).delete()
+        db.collection("journal_entries").document(docId).delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -256,17 +289,32 @@ public class JournalEntries extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_settings:
+                intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.menu_signout:
+                FirebaseAuth.getInstance().signOut();
+                intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshData();
     }
 }

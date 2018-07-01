@@ -31,6 +31,7 @@ public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEn
         TextView date;
         FrameLayout layout;
         ImageView priority;
+        RelativeLayout viewFor, viewBack;
 
         public ViewHolder(View v) {
             super(v);
@@ -39,6 +40,8 @@ public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEn
             date = (TextView) v.findViewById(R.id.textView_date);
             priority = (ImageView) v.findViewById(R.id.imageView_fav);
             layout = (FrameLayout) v.findViewById(R.id.item_linearlayout);
+            viewBack = (RelativeLayout) v.findViewById(R.id.view_background);
+            viewFor = (RelativeLayout) v.findViewById(R.id.view_foreground);
 
             layout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -89,8 +92,21 @@ public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEn
     }
 
     public void setmDataset(List<EntryListClass> mDataset) {
+        clearData();
         this.mDataset = mDataset;
         this.items.addAll(mDataset);
+
+        notifyDataSetChanged();
+    }
+
+    public void clearData() {
+        this.items.clear();
+        notifyDataSetChanged();
+    }
+
+    public void removeItem(int position) {
+        this.items.remove(position);
+        this.mDataset.remove(position);
     }
 
     // Create new views (invoked by the layout manager)
@@ -110,8 +126,14 @@ public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEn
     public void onBindViewHolder(ViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.title.setText(items.get(position).getTitle());
-        holder.content.setText(items.get(position).getContent());
+        try {
+            holder.title.setText(items.get(position).getTitle().substring(0, 1).toUpperCase()+items.get(position).getTitle().substring(1));
+            holder.content.setText(items.get(position).getContent().substring(0, 1).toUpperCase()+items.get(position).getContent().substring(1));
+        }
+        catch(StringIndexOutOfBoundsException e) {
+            holder.title.setText("");
+            holder.content.setText("");
+        }
         holder.date.setText(items.get(position).getDate());
         holder.priority.setImageDrawable(items.get(position).getPriorityImage(res));
     }
