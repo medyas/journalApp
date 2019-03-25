@@ -17,7 +17,10 @@
 package com.medyas.journalapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -43,6 +46,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import io.reactivex.CompletableObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+
 public class EntryDetail extends AppCompatActivity {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -56,24 +63,30 @@ public class EntryDetail extends AppCompatActivity {
     ProgressBar progress;
 
     private String entryId;
+    private DataBaseConnection database;
+    private String currentUserId;
+    private EntryClass entryItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry_detail);
+        database = new DataBaseConnection();
+        database.initDB(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        currentUserId = sharedPref.getString(getString(R.string.clientUID), null);
 
         if (getSupportActionBar()!=null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-
-        progress = (ProgressBar) findViewById(R.id.progressBar);
-        entryTitle = (TextView) findViewById(R.id.textViewTitle);
-        entryContent = (TextView) findViewById(R.id.textViewContent);
-        entryPri = (CheckBox) findViewById(R.id.checkBoxPri);
-        container = (ScrollView) findViewById(R.id.entry_container);
+        progress = findViewById(R.id.progressBar);
+        entryTitle = findViewById(R.id.textViewTitle);
+        entryContent = findViewById(R.id.textViewContent);
+        entryPri = findViewById(R.id.checkBoxPri);
+        container = findViewById(R.id.entry_container);
         container.setVisibility(View.GONE);
 
         try {
@@ -81,6 +94,9 @@ public class EntryDetail extends AppCompatActivity {
         } catch (NullPointerException e) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                finishAffinity();
+            }
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.edit_entry_fab);
@@ -93,8 +109,38 @@ public class EntryDetail extends AppCompatActivity {
             }
         });
 
+        database.getEntry(currentUserId, entryId).subscribe(new DisposableObserver<EntryClass>() {
+            @Override
+            public void onNext(EntryClass entryClass) {
+                if (entryClass != null) {
+                    entryItem = entryClass;
+                    setTitle(entryClass.getTitle());
+                    entryTitle.setText(entryClass.getTitle());
+                    entryContent.setText(entryClass.getContent());
+                    if(entryClass.getPriority().equals("true")) {
+                        entryPri.setChecked(true);
+                    }
+                } else {
+                    Snackbar.make(entryTitle, "Null Data was found", Snackbar.LENGTH_LONG).show();
+                }
+                progress.setVisibility(View.GONE);
+                container.setVisibility(View.VISIBLE);
+            }
 
-        db.collection("journal_entries").document(entryId)
+            @Override
+            public void onError(Throwable e) {
+                progress.setVisibility(View.GONE);
+                container.setVisibility(View.VISIBLE);
+                e.printStackTrace();
+                Snackbar.make(entryTitle, "Could not get Data", Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onComplete() {
+            }
+        });
+
+        /*db.collection("journal_entries").document(entryId)
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -118,13 +164,37 @@ public class EntryDetail extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
                 container.setVisibility(View.VISIBLE);
             }
-        });
+        });*/
     }
 
-    public void deleteEntry(String docId) {
+    public void deleteEntry() {
         progress.setVisibility(View.VISIBLE);
         container.setVisibility(View.GONE);
-        db.collection("journal_entries").document(docId).delete()
+        database.deleteEntry(entryItem).subscribe(new CompletableObserver() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                progress.setVisibility(View.GONE);
+                container.setVisibility(View.VISIBLE);
+                Intent intent = new Intent(getApplicationContext(), JournalEntries.class);
+                startActivity(intent);
+                Toast.makeText(getApplicationContext(), "Entry deleted.",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                progress.setVisibility(View.GONE);
+                container.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(), "Could not delete the entery!",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+       /* db.collection("journal_entries").document(docId).delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -144,7 +214,7 @@ public class EntryDetail extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Could not delete the entery!",
                                 Toast.LENGTH_SHORT).show();
                     }
-                });
+                });*/
     }
 
     @Override
@@ -166,9 +236,7 @@ public class EntryDetail extends AppCompatActivity {
             startActivity(shareEntryIntent);
             return true;
         } else if( menuItem == R.id.menu_delete_entry) {
-            progress.setVisibility(View.VISIBLE);
-            container.setVisibility(View.GONE);
-            deleteEntry(entryId);
+            deleteEntry();
             return true;
         } else if( menuItem == android.R.id.home) {
             NavUtils.navigateUpFromSameTask(this);

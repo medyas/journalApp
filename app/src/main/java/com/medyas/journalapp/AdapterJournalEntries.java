@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -16,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEntries.ViewHolder> {
-    private List<EntryListClass> mDataset = new ArrayList<EntryListClass>();
-    private List<EntryListClass> items = new ArrayList<EntryListClass>();
+    private List<EntryClass> mDataset = new ArrayList<EntryClass>();
+    private List<EntryClass> items = new ArrayList<EntryClass>();
     private Resources res;
 
     // Provide a reference to the views for each data item
@@ -64,7 +63,7 @@ public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEn
     public AdapterJournalEntries() {
     }
 
-    public AdapterJournalEntries(List<EntryListClass> dataList, Resources res) {
+    public AdapterJournalEntries(List<EntryClass> dataList, Resources res) {
         this.res = res;
         this.mDataset = dataList;
         this.items.addAll(dataList);
@@ -82,7 +81,7 @@ public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEn
             items.addAll(mDataset);
         } else{
             text = text.toLowerCase();
-            for(EntryListClass item: mDataset){
+            for(EntryClass item: mDataset){
                 if(item.getTitle().toLowerCase().contains(text)){
                     items.add(item);
                 }
@@ -91,7 +90,7 @@ public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEn
         notifyDataSetChanged();
     }
 
-    public void setmDataset(List<EntryListClass> mDataset) {
+    public void setmDataset(List<EntryClass> mDataset) {
         clearData();
         this.mDataset = mDataset;
         this.items.addAll(mDataset);
@@ -100,7 +99,7 @@ public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEn
     }
 
     public void clearData() {
-        this.items.clear();
+        if(this.items != null && !this.items.isEmpty()) this.items.clear();
         notifyDataSetChanged();
     }
 
@@ -136,7 +135,7 @@ public class AdapterJournalEntries extends RecyclerView.Adapter<AdapterJournalEn
         }
         String date = items.get(position).getDate().split("-")[0] +"-"+ items.get(position).getDate().split("-")[1];
         holder.date.setText(date);
-        holder.priority.setImageDrawable(items.get(position).getPriorityImage(res));
+        holder.priority.setImageDrawable(items.get(position).retrievePriorityImage(res));
     }
 
     // Return the size of your dataset (invoked by the layout manager)

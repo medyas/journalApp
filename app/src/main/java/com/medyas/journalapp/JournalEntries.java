@@ -16,7 +16,6 @@
 
 package com.medyas.journalapp;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -35,7 +34,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -45,14 +43,13 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.amazonaws.mobileconnectors.dynamodbv2.document.datatype.Document;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -60,13 +57,17 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.CompletableObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
+
 public class JournalEntries extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private AdapterJournalEntries mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private List<EntryListClass> dataList = new ArrayList<EntryListClass>();
+    private List<EntryClass> dataList = new ArrayList<EntryClass>();
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String currentUserId;
@@ -75,12 +76,30 @@ public class JournalEntries extends AppCompatActivity {
     private SearchView searchEntry;
     private ProgressBar progress;
     SwipeRefreshLayout swipeRefreshLayout;
+    private DataBaseConnection database;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_journal_entries);
+        database = new DataBaseConnection();
+        database.initDB(this).subscribe(new CompletableObserver() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                refreshData();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+        });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -90,10 +109,10 @@ public class JournalEntries extends AppCompatActivity {
         setTitle(user.getDisplayName().substring(0, 1).toUpperCase()+user.getDisplayName().substring(1)+" Journals");
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-
         currentUserId = sharedPref.getString(getString(R.string.clientUID), null);
         if(currentUserId == null) {
             currentUserId = user.getUid();
+            sharedPref.edit().putString(getString(R.string.clientUID), currentUserId);
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_entry_fab);
@@ -134,7 +153,6 @@ public class JournalEntries extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
 
         progress = (ProgressBar) findViewById(R.id.progressBar);
-        refreshData();
 
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
@@ -154,11 +172,11 @@ public class JournalEntries extends AppCompatActivity {
                     builder.setPositiveButton("REMOVE", new DialogInterface.OnClickListener() { //when click on DELETE
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            deleteEntry(dataList.get(position));
                             mAdapter.notifyItemRemoved(position);    //item removed from recylcerview
                             mAdapter.removeItem(position);
-                            dataList.remove(position);  //then remove item
+//                            dataList.remove(position);  //then remove item
                             mAdapter.notifyDataSetChanged();
-                            deleteEntry(dataList.get(position).getDocId());
                         }
                     }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {  //not removing items if cancel is done
                         @Override
@@ -201,12 +219,47 @@ public class JournalEntries extends AppCompatActivity {
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(mRecyclerView);
-
-
     }
 
     public void refreshData() {
-        db.collection("journal_entries")
+        database.getEntries(currentUserId)
+                .subscribe(new DisposableObserver<List<EntryClass>>() {
+                    @Override
+                    public void onNext(List<EntryClass> documents) {
+                        if(documents != null && !documents.isEmpty()) {
+                            dataList.clear();
+                            dataList.addAll(documents);
+                            mAdapter.setmDataset(dataList);
+                            mAdapter.notifyDataSetChanged();
+                        } else {
+                            if(documents != null && documents.isEmpty()) {
+                                Snackbar.make(mRecyclerView, "List is empty", Snackbar.LENGTH_INDEFINITE)
+                                        .show();
+                            } else {
+                                Snackbar.make(mRecyclerView, "Could not get Data", Snackbar.LENGTH_INDEFINITE)
+                                        .setAction("Retry", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                refreshData();
+                                            }
+                                        })
+                                        .show();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        progress.setVisibility(View.GONE);
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+        /*db.collection("journal_entries")
                 .whereEqualTo(getString(R.string.client_uid), currentUserId)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -215,7 +268,7 @@ public class JournalEntries extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             dataList.clear();
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                EntryListClass entry = new EntryListClass(document.getData().get(getString(R.string.entry_title)).toString(),
+                                EntryClass entry = new EntryClass(document.getData().get(getString(R.string.entry_title)).toString(),
                                         document.getData().get(getString(R.string.entry_content)).toString(),
                                         document.getData().get(getString(R.string.entry_date)).toString(),
                                         document.getData().get(getString(R.string.entry_priority)).toString(),
@@ -237,13 +290,35 @@ public class JournalEntries extends AppCompatActivity {
                         progress.setVisibility(View.GONE);
                         swipeRefreshLayout.setRefreshing(false);
                     }
-                });
+                });*/
     }
 
-    public void deleteEntry(String docId) {
+    public void deleteEntry(EntryClass item) {
         progress.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
-        db.collection("journal_entries").document(docId).delete()
+        database.deleteEntry(item).subscribe(new CompletableObserver() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onComplete() {
+                progress.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(), "Entry deleted.",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                progress.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(), "Could not delete the entry!",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        /*db.collection("journal_entries").document(docId).delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -261,7 +336,7 @@ public class JournalEntries extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Could not delete the entery!",
                                 Toast.LENGTH_SHORT).show();
                     }
-                });
+                });*/
     }
 
 
@@ -317,6 +392,5 @@ public class JournalEntries extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        refreshData();
     }
 }
